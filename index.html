@@ -15,6 +15,7 @@
             --exito: #10b981;
             --error: #ef4444;
             --alerta: #f59e0b;
+            --info: #0284c7;
         }
 
         body {
@@ -102,6 +103,13 @@
             animation: pulso-exito 2s infinite;
         }
 
+        .badge-graduado {
+            background-color: #f0f9ff;
+            color: var(--info);
+            border: 1px solid #bae6fd;
+            animation: pulso-graduado 2s infinite;
+        }
+
         .badge-invalido {
             background-color: #fef2f2;
             color: var(--error);
@@ -112,6 +120,12 @@
             0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
             70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
             100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+
+        @keyframes pulso-graduado {
+            0% { box-shadow: 0 0 0 0 rgba(2, 132, 199, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(2, 132, 199, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(2, 132, 199, 0); }
         }
 
         /* Bloques de Información Estandarizada */
@@ -179,8 +193,13 @@
             </div>
 
             <div class="bloque-info">
-                <p class="etiqueta">Periodo Lectivo Activo</p>
+                <p class="etiqueta">Periodo Lectivo</p>
                 <p id="lblPeriodo" class="valor">Consultando...</p>
+            </div>
+
+            <div class="bloque-info">
+                <p class="etiqueta">Código de Folio Seguro</p>
+                <p id="lblFolio" class="valor">Consultando...</p>
             </div>
         </div>
         
@@ -198,6 +217,7 @@
         const lblNombre = document.getElementById("lblNombre");
         const lblCedula = document.getElementById("lblCedula");
         const lblPeriodo = document.getElementById("lblPeriodo");
+        const lblFolio = document.getElementById("lblFolio");
         const badgeEstado = document.getElementById("badgeEstado");
         const iconoEstado = document.getElementById("iconoEstado");
         const txtEstado = document.getElementById("txtEstado");
@@ -206,6 +226,7 @@
             lblNombre.textContent = "Acceso Denegado";
             lblCedula.textContent = "Parámetro ausente";
             lblPeriodo.textContent = "No disponible";
+            lblFolio.textContent = "INVÁLIDO";
             
             badgeEstado.className = "badge-estado badge-invalido";
             iconoEstado.textContent = "❌";
@@ -225,20 +246,42 @@
                     lblNombre.textContent = `${campos.apellido.stringValue} ${campos.nombre.stringValue}`;
                     lblCedula.textContent = campos.cedula.stringValue;
                     lblPeriodo.textContent = campos.periodo.stringValue;
+                    
+                    // Extraer folio seguro generado por Python (si no existe, muestra pendiente)
+                    lblFolio.textContent = campos.folio && campos.folio.stringValue ? campos.folio.stringValue : "Asignando...";
 
-                    // Cambio de interfaz a Modo Premium Autorizado (con animación de pulso)
-                    badgeEstado.className = "badge-estado badge-valido";
-                    iconoEstado.textContent = "🛡️";
-                    txtEstado.textContent = "CREDENCIAL ACTIVA Y VERIFICADA";
+                    // CONTROL DE ESTADO DINÁMICO MULTI-COLOR (ANTI-FRAUDE)
+                    const estadoAlumno = campos.estado && campos.estado.stringValue ? campos.estado.stringValue.trim().toLowerCase() : "activo";
+
+                    if (estadoAlumno === "activo") {
+                        badgeEstado.className = "badge-estado badge-valido";
+                        iconoEstado.textContent = "🛡️";
+                        txtEstado.textContent = "CREDENCIAL ACTIVA Y VERIFICADA";
+                        
+                    } else if (estadoAlumno === "graduado") {
+                        badgeEstado.className = "badge-estado badge-graduado";
+                        iconoEstado.textContent = "🎓";
+                        txtEstado.textContent = "ESTUDIANTE GRADUADO / TITULADO";
+                        
+                    } else if (estadoAlumno === "retirado" || estadoAlumno === "no culminado") {
+                        badgeEstado.className = "badge-estado badge-invalido";
+                        iconoEstado.textContent = "⚠️";
+                        txtEstado.textContent = "ALERTA: ESTUDIANTE NO VIGENTE";
+                        
+                        // Modificaciones sutiles de interfaz para denotar inactividad
+                        lblNombre.style.color = "#94a3b8";
+                        lblPeriodo.textContent = "REGISTRO RETIRADO / INACTIVO";
+                    }
                 })
                 .catch(err => {
                     lblNombre.textContent = "USUARIO NO REGISTRADO";
                     lblCedula.textContent = idCedula;
                     lblPeriodo.textContent = "SINFONÍA DE DATOS RECHAZADA";
+                    lblFolio.textContent = "NO EXISTE";
                     
                     badgeEstado.className = "badge-estado badge-invalido";
-                    iconoEstado.textContent = "⚠️";
-                    txtEstado.textContent = "ALERTA: ESTUDIANTE NO VIGENTE";
+                    iconoEstado.textContent = "❌";
+                    txtEstado.textContent = "ALERTA: CREDENCIAL NO VÁLIDA";
                 });
         }
     </script>
