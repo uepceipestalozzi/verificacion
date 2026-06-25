@@ -75,7 +75,7 @@
 
         /* Badge Dinámico de Estado */
         .badge-estado {
-            padding: 12px 20px;
+            padding: 14px 20px;
             border-radius: 50px;
             font-weight: 700;
             font-size: 13px;
@@ -88,6 +88,7 @@
             width: 100%;
             box-sizing: border-box;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+            text-align: center;
         }
 
         .badge-cargando {
@@ -225,6 +226,39 @@
         const iconoEstado = document.getElementById("iconoEstado");
         const txtEstado = document.getElementById("txtEstado");
 
+        // FUNCIONES DE SINTETIZADOR DE AUDIO NATIVO
+        function reproducirSonidoExito() {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.type = "sine";
+                osc.frequency.setValueAtTime(880, ctx.currentTime); // Bip agudo de escáner limpio
+                gain.gain.setValueAtTime(0.1, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.2);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.2);
+            } catch(e) {}
+        }
+
+        function reproducirSonidoAlerta() {
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc1 = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc1.type = "sawtooth"; // Sonido áspero tipo alarma/error
+                osc1.frequency.setValueAtTime(150, ctx.currentTime);
+                gain.gain.setValueAtTime(0.15, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4);
+                osc1.connect(gain);
+                gain.connect(ctx.destination);
+                osc1.start();
+                osc1.stop(ctx.currentTime + 0.4);
+            } catch(e) {}
+        }
+
         if (!idCedula) {
             lblNombre.textContent = "Acceso Denegado";
             lblCedula.textContent = "Parámetro ausente";
@@ -233,7 +267,8 @@
             
             badgeEstado.className = "badge-estado badge-retirado";
             iconoEstado.textContent = "❌";
-            txtEstado.textContent = "URL MANIPULADA O INVÁLIDA";
+            txtEstado.textContent = "Documento Inválido / Retirado";
+            setTimeout(reproducirSonidoAlerta, 300);
         } else {
             const urlAPI = `https://firestore.googleapis.com/v1/projects/${PROJECT_ID}/databases/(default)/documents/estudiantes/${idCedula.trim()}`;
 
@@ -250,44 +285,44 @@
                     lblPeriodo.textContent = campos.periodo.stringValue;
                     lblFolio.textContent = campos.folio && campos.folio.stringValue ? campos.folio.stringValue : "Asignando...";
 
-                    // CONTROL DE ESTADO EXCLUSIVO (Activo, Graduado, Retirado)
+                    // CONTROL DE ESTADO PREMIUM
                     const estadoAlumno = campos.estado && campos.estado.stringValue ? campos.estado.stringValue.trim().toLowerCase() : "activo";
 
                     if (estadoAlumno === "activo") {
                         badgeEstado.className = "badge-estado badge-activo";
                         iconoEstado.textContent = "🛡️";
-                        txtEstado.textContent = "Activo";
-                        
-                        // Estilos de texto normal
+                        txtEstado.textContent = "Documento Válido / Estudiante Activo";
                         lblNombre.style.color = "#1e293b";
+                        setTimeout(reproducirSonidoExito, 200);
                         
                     } else if (estadoAlumno === "graduado") {
                         badgeEstado.className = "badge-estado badge-graduado";
                         iconoEstado.textContent = "🎓";
-                        txtEstado.textContent = "Graduado";
-                        
+                        txtEstado.textContent = "Grado Académico Otorgado";
                         lblNombre.style.color = "#1e293b";
+                        setTimeout(reproducirSonidoExito, 200);
                         
                     } else {
-                        // Cualquier otra opción o "retirado" cae en la alerta roja estricta
                         badgeEstado.className = "badge-estado badge-retirado";
                         iconoEstado.textContent = "⚠️";
-                        txtEstado.textContent = "Retirado";
+                        txtEstado.textContent = "Documento Inválido / Retirado";
                         
-                        // Atenuamos visualmente los datos del alumno retirado
                         lblNombre.style.color = "#94a3b8";
                         lblPeriodo.textContent = "REGISTRO INACTIVO / NO VIGENTE";
+                        setTimeout(reproducirSonidoAlerta, 200);
                     }
                 })
                 .catch(err => {
+                    // PROTECCIÓN ACTIVA CONTRA CÉDULAS FALSAS O EDITADAS MANUAlMENTE
                     lblNombre.textContent = "USUARIO NO REGISTRADO";
                     lblCedula.textContent = idCedula;
-                    lblPeriodo.textContent = "SINFONÍA DE DATOS RECHAZADA";
+                    lblPeriodo.textContent = "REGISTRO NO ENCONTRADO EN EL SISTEMA";
                     lblFolio.textContent = "NO EXISTE";
                     
                     badgeEstado.className = "badge-estado badge-retirado";
                     iconoEstado.textContent = "❌";
-                    txtEstado.textContent = "ALERTA: CREDENCIAL NO VÁLIDA";
+                    txtEstado.textContent = "Documento Inválido / Retirado";
+                    setTimeout(reproducirSonidoAlerta, 200);
                 });
         }
     </script>
