@@ -18,6 +18,10 @@
             --error: #ef4444;
         }
 
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
         body {
             font-family: 'Inter', sans-serif;
             margin: 0;
@@ -86,7 +90,6 @@
             gap: 8px;
             margin-bottom: 30px;
             width: 100%;
-            box-sizing: border-box;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
             text-align: center;
         }
@@ -226,14 +229,14 @@
         const iconoEstado = document.getElementById("iconoEstado");
         const txtEstado = document.getElementById("txtEstado");
 
-        // FUNCIONES DE SINTETIZADOR DE AUDIO NATIVO
+        // SINTETIZADOR NATIVO DE EFECTOS DE SONIDO (Sin archivos externos)
         function reproducirSonidoExito() {
             try {
                 const ctx = new (window.AudioContext || window.webkitAudioContext)();
                 const osc = ctx.createOscillator();
                 const gain = ctx.createGain();
                 osc.type = "sine";
-                osc.frequency.setValueAtTime(880, ctx.currentTime); // Bip agudo de escáner limpio
+                osc.frequency.setValueAtTime(880, ctx.currentTime); // Tono agudo (Bip de escáner limpio)
                 gain.gain.setValueAtTime(0.1, ctx.currentTime);
                 gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.2);
                 osc.connect(gain);
@@ -248,7 +251,7 @@
                 const ctx = new (window.AudioContext || window.webkitAudioContext)();
                 const osc1 = ctx.createOscillator();
                 const gain = ctx.createGain();
-                osc1.type = "sawtooth"; // Sonido áspero tipo alarma/error
+                osc1.type = "sawtooth"; // Onda de sierra para un sonido áspero tipo error/alarma
                 osc1.frequency.setValueAtTime(150, ctx.currentTime);
                 gain.gain.setValueAtTime(0.15, ctx.currentTime);
                 gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4);
@@ -275,7 +278,7 @@
             fetch(urlAPI)
                 .then(res => {
                     if (res.status === 200) return res.json();
-                    throw new Error("No existe");
+                    throw new Error("No existe el alumno");
                 })
                 .then(data => {
                     const campos = data.fields;
@@ -285,7 +288,7 @@
                     lblPeriodo.textContent = campos.periodo.stringValue;
                     lblFolio.textContent = campos.folio && campos.folio.stringValue ? campos.folio.stringValue : "Asignando...";
 
-                    // CONTROL DE ESTADO PREMIUM
+                    // CONTROL DE ESTADO PREMIUM (Activo, Graduado, Retirado)
                     const estadoAlumno = campos.estado && campos.estado.stringValue ? campos.estado.stringValue.trim().toLowerCase() : "activo";
 
                     if (estadoAlumno === "activo") {
@@ -303,6 +306,7 @@
                         setTimeout(reproducirSonidoExito, 200);
                         
                     } else {
+                        // Aplica para el estado "Retirado" o cualquier texto no esperado
                         badgeEstado.className = "badge-estado badge-retirado";
                         iconoEstado.textContent = "⚠️";
                         txtEstado.textContent = "Documento Inválido / Retirado";
@@ -313,7 +317,7 @@
                     }
                 })
                 .catch(err => {
-                    // PROTECCIÓN ACTIVA CONTRA CÉDULAS FALSAS O EDITADAS MANUAlMENTE
+                    // SE ACTIVA CUANDO ALGUIEN CAMBIA UN NÚMERO DE CÉDULA EN LA URL Y NO EXISTE EN FIREBASE
                     lblNombre.textContent = "USUARIO NO REGISTRADO";
                     lblCedula.textContent = idCedula;
                     lblPeriodo.textContent = "REGISTRO NO ENCONTRADO EN EL SISTEMA";
