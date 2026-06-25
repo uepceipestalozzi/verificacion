@@ -11,11 +11,11 @@
             --azul-institucional: #17326a;
             --azul-oscuro: #0f2147;
             --dorado: #d4af37;
+            --dorado-suave: #fef3c7;
+            --dorado-texto: #b45309;
             --gris-fondo: #f8fafc;
             --exito: #10b981;
             --error: #ef4444;
-            --alerta: #f59e0b;
-            --info: #0284c7;
         }
 
         body {
@@ -77,7 +77,7 @@
         .badge-estado {
             padding: 12px 20px;
             border-radius: 50px;
-            font-weight: 600;
+            font-weight: 700;
             font-size: 13px;
             letter-spacing: 0.5px;
             display: inline-flex;
@@ -91,41 +91,44 @@
         }
 
         .badge-cargando {
-            background-color: #fef3c7;
-            color: #d97706;
-            border: 1px solid #fde68a;
+            background-color: #f1f5f9;
+            color: #64748b;
+            border: 1px solid #cbd5e1;
         }
 
-        .badge-valido {
+        /* Verde Profesional */
+        .badge-activo {
             background-color: #ecfdf5;
             color: var(--exito);
             border: 1px solid #a7f3d0;
-            animation: pulso-exito 2s infinite;
+            animation: pulso-activo 2s infinite;
         }
 
+        /* Dorado Ejecutivo */
         .badge-graduado {
-            background-color: #f0f9ff;
-            color: var(--info);
-            border: 1px solid #bae6fd;
+            background-color: var(--dorado-suave);
+            color: var(--dorado-texto);
+            border: 1px solid #fde68a;
             animation: pulso-graduado 2s infinite;
         }
 
-        .badge-invalido {
+        /* Rojo Alerta Fulminante */
+        .badge-retirado {
             background-color: #fef2f2;
             color: var(--error);
             border: 1px solid #fecaca;
         }
 
-        @keyframes pulso-exito {
+        @keyframes pulso-activo {
             0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
             70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
             100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
         }
 
         @keyframes pulso-graduado {
-            0% { box-shadow: 0 0 0 0 rgba(2, 132, 199, 0.4); }
-            70% { box-shadow: 0 0 0 10px rgba(2, 132, 199, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(2, 132, 199, 0); }
+            0% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(212, 175, 55, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0); }
         }
 
         /* Bloques de Información Estandarizada */
@@ -228,7 +231,7 @@
             lblPeriodo.textContent = "No disponible";
             lblFolio.textContent = "INVÁLIDO";
             
-            badgeEstado.className = "badge-estado badge-invalido";
+            badgeEstado.className = "badge-estado badge-retirado";
             iconoEstado.textContent = "❌";
             txtEstado.textContent = "URL MANIPULADA O INVÁLIDA";
         } else {
@@ -242,35 +245,38 @@
                 .then(data => {
                     const campos = data.fields;
                     
-                    // Renderizado de la información limpia extraída de la nube
                     lblNombre.textContent = `${campos.apellido.stringValue} ${campos.nombre.stringValue}`;
                     lblCedula.textContent = campos.cedula.stringValue;
                     lblPeriodo.textContent = campos.periodo.stringValue;
-                    
-                    // Extraer folio seguro generado por Python (si no existe, muestra pendiente)
                     lblFolio.textContent = campos.folio && campos.folio.stringValue ? campos.folio.stringValue : "Asignando...";
 
-                    // CONTROL DE ESTADO DINÁMICO MULTI-COLOR (ANTI-FRAUDE)
+                    // CONTROL DE ESTADO EXCLUSIVO (Activo, Graduado, Retirado)
                     const estadoAlumno = campos.estado && campos.estado.stringValue ? campos.estado.stringValue.trim().toLowerCase() : "activo";
 
                     if (estadoAlumno === "activo") {
-                        badgeEstado.className = "badge-estado badge-valido";
+                        badgeEstado.className = "badge-estado badge-activo";
                         iconoEstado.textContent = "🛡️";
-                        txtEstado.textContent = "CREDENCIAL ACTIVA Y VERIFICADA";
+                        txtEstado.textContent = "Activo";
+                        
+                        // Estilos de texto normal
+                        lblNombre.style.color = "#1e293b";
                         
                     } else if (estadoAlumno === "graduado") {
                         badgeEstado.className = "badge-estado badge-graduado";
                         iconoEstado.textContent = "🎓";
-                        txtEstado.textContent = "ESTUDIANTE GRADUADO / TITULADO";
+                        txtEstado.textContent = "Graduado";
                         
-                    } else if (estadoAlumno === "retirado" || estadoAlumno === "no culminado") {
-                        badgeEstado.className = "badge-estado badge-invalido";
+                        lblNombre.style.color = "#1e293b";
+                        
+                    } else {
+                        // Cualquier otra opción o "retirado" cae en la alerta roja estricta
+                        badgeEstado.className = "badge-estado badge-retirado";
                         iconoEstado.textContent = "⚠️";
-                        txtEstado.textContent = "ALERTA: ESTUDIANTE NO VIGENTE";
+                        txtEstado.textContent = "Retirado";
                         
-                        // Modificaciones sutiles de interfaz para denotar inactividad
+                        // Atenuamos visualmente los datos del alumno retirado
                         lblNombre.style.color = "#94a3b8";
-                        lblPeriodo.textContent = "REGISTRO RETIRADO / INACTIVO";
+                        lblPeriodo.textContent = "REGISTRO INACTIVO / NO VIGENTE";
                     }
                 })
                 .catch(err => {
@@ -279,7 +285,7 @@
                     lblPeriodo.textContent = "SINFONÍA DE DATOS RECHAZADA";
                     lblFolio.textContent = "NO EXISTE";
                     
-                    badgeEstado.className = "badge-estado badge-invalido";
+                    badgeEstado.className = "badge-estado badge-retirado";
                     iconoEstado.textContent = "❌";
                     txtEstado.textContent = "ALERTA: CREDENCIAL NO VÁLIDA";
                 });
