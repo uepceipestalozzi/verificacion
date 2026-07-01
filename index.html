@@ -10,7 +10,7 @@
         :root {
             --azul-institucional: #17326a;
             --azul-oscuro: #0f2147;
-            --dorado: #d4af37;
+            --dorado: #ffc000; 
             --dorado-suave: #fef3c7;
             --dorado-texto: #b45309;
             --gris-fondo: #f8fafc;
@@ -36,42 +36,36 @@
         .contenedor-carnet {
             background: #ffffff;
             width: 100%;
-            max-width: 420px; /* Lo ensanchamos un poquito (de 400 a 420) para dar espacio al escudo */
+            max-width: 420px;
             margin: 20px;
             border-radius: 24px;
-            border: 4px solid var(--dorado); /* Mantiene el marco dorado exterior completo */
+            border: 4px solid var(--dorado);
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
             overflow: hidden;
             transition: all 0.3s ease;
         }
 
-        /* Encabezado Negro Brilloso Impactante con Flexbox */
         .encabezado-institucional {
-            /* Degradado sutil de negro a un tono pizarra para el efecto "brilloso/reflejo" */
             background: linear-gradient(135deg, #1e293b 0%, #020617 50%, #000000 100%);
             padding: 25px 20px;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 15px; /* Espacio exacto entre el escudo y el texto */
+            gap: 15px;
             position: relative;
-            /* Línea dorada divisoria inferior que querías mantener */
             border-bottom: 3px solid var(--dorado); 
         }
 
-        /* Estilos para el Escudo del Colegio */
         .escudo-colegio {
             width: 55px;
             height: 55px;
             object-fit: contain;
-            /* Filtro de sombra suave para que el escudo resalte sobre el negro */
             filter: drop-shadow(0px 2px 8px rgba(255, 255, 255, 0.15));
-            flex-shrink: 0; /* Evita que el escudo se deforme en pantallas pequeñas */
+            flex-shrink: 0;
         }
 
-        /* Alineación del bloque de textos a la derecha del escudo */
         .textos-encabezado {
-            text-align: left; /* Alineado a la izquierda junto al escudo para orden pro */
+            text-align: left;
         }
 
         .encabezado-institucional h1 {
@@ -91,13 +85,11 @@
             letter-spacing: 1.5px;
         }
 
-        /* Cuerpo del Carnet */
         .cuerpo-carnet {
             padding: 35px 30px;
             background: #ffffff;
         }
 
-        /* Badge Dinámico de Estado */
         .badge-estado {
             padding: 14px 20px;
             border-radius: 50px;
@@ -152,7 +144,6 @@
             100% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0); }
         }
 
-        /* Bloques de Información */
         .bloque-info {
             margin-bottom: 22px;
             border-bottom: 1px solid #f1f5f9;
