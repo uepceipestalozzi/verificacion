@@ -26,7 +26,8 @@
             font-family: 'Inter', sans-serif;
             margin: 0;
             padding: 0;
-            background: linear-gradient(135deg, #e2e8f0 0%, var(--gris-fondo) 100%);
+            /* Gradiente azul brillante/eléctrico premium de fondo */
+            background: radial-gradient(circle at center, #1e40af 0%, #0f172a 100%);
             display: flex;
             justify-content: center;
             align-items: center;
@@ -34,14 +35,16 @@
         }
 
         .contenedor-carnet {
-            background: #ffffff;
+            background: #ffffff; /* El fondo de la tarjeta se mantiene en blanco puro */
             width: 100%;
             max-width: 400px;
             margin: 20px;
             border-radius: 24px;
-            box-shadow: 0 20px 40px rgba(15, 33, 71, 0.15);
+            /* Línea dorada enmarcando TODA la tarjeta */
+            border: 4px solid var(--dorado); 
+            /* Sombra profunda adaptada al nuevo fondo azul */
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
             overflow: hidden;
-            border: 1px solid rgba(23, 50, 106, 0.08);
             transition: all 0.3s ease;
         }
 
@@ -51,7 +54,7 @@
             padding: 30px 20px;
             text-align: center;
             position: relative;
-            border-bottom: 4px solid var(--dorado);
+            /* Eliminado el borde inferior para que no choque con el marco completo */
         }
 
         .encabezado-institucional h1 {
@@ -116,7 +119,7 @@
             animation: pulso-graduado 2s infinite;
         }
 
-        /* Rojo Alerta Fulminante */
+        /* Rojo Alerta */
         .badge-retirado {
             background-color: #fef2f2;
             color: var(--error);
@@ -135,7 +138,7 @@
             100% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0); }
         }
 
-        /* Bloques de Información Estandarizada */
+        /* Bloques de Información */
         .bloque-info {
             margin-bottom: 22px;
             border-bottom: 1px solid #f1f5f9;
@@ -229,14 +232,13 @@
         const iconoEstado = document.getElementById("iconoEstado");
         const txtEstado = document.getElementById("txtEstado");
 
-        // SINTETIZADOR NATIVO DE EFECTOS DE SONIDO (Sin archivos externos)
         function reproducirSonidoExito() {
             try {
                 const ctx = new (window.AudioContext || window.webkitAudioContext)();
                 const osc = ctx.createOscillator();
                 const gain = ctx.createGain();
                 osc.type = "sine";
-                osc.frequency.setValueAtTime(880, ctx.currentTime); // Tono agudo (Bip de escáner limpio)
+                osc.frequency.setValueAtTime(880, ctx.currentTime);
                 gain.gain.setValueAtTime(0.1, ctx.currentTime);
                 gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.2);
                 osc.connect(gain);
@@ -251,7 +253,7 @@
                 const ctx = new (window.AudioContext || window.webkitAudioContext)();
                 const osc1 = ctx.createOscillator();
                 const gain = ctx.createGain();
-                osc1.type = "sawtooth"; // Onda de sierra para un sonido áspero tipo error/alarma
+                osc1.type = "sawtooth";
                 osc1.frequency.setValueAtTime(150, ctx.currentTime);
                 gain.gain.setValueAtTime(0.15, ctx.currentTime);
                 gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4);
@@ -288,7 +290,6 @@
                     lblPeriodo.textContent = campos.periodo.stringValue;
                     lblFolio.textContent = campos.folio && campos.folio.stringValue ? campos.folio.stringValue : "Asignando...";
 
-                    // CONTROL DE ESTADO PREMIUM (Activo, Graduado, Retirado)
                     const estadoAlumno = campos.estado && campos.estado.stringValue ? campos.estado.stringValue.trim().toLowerCase() : "activo";
 
                     if (estadoAlumno === "activo") {
@@ -306,7 +307,6 @@
                         setTimeout(reproducirSonidoExito, 200);
                         
                     } else {
-                        // Aplica para el estado "Retirado" o cualquier texto no esperado
                         badgeEstado.className = "badge-estado badge-retirado";
                         iconoEstado.textContent = "⚠️";
                         txtEstado.textContent = "Documento Inválido / Retirado";
@@ -317,7 +317,6 @@
                     }
                 })
                 .catch(err => {
-                    // SE ACTIVA CUANDO ALGUIEN CAMBIA UN NÚMERO DE CÉDULA EN LA URL Y NO EXISTE EN FIREBASE
                     lblNombre.textContent = "USUARIO NO REGISTRADO";
                     lblCedula.textContent = idCedula;
                     lblPeriodo.textContent = "REGISTRO NO ENCONTRADO EN EL SISTEMA";
